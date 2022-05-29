@@ -33,13 +33,50 @@ getProducts().then(products=>{
                 var newOption=new Option(product.colors[i],product.colors[i]);
                 listeSelectionCouleur.options[i+1]=newOption;
             }
+
             
         } 
        
     }
 })
 
+class Panier{
+    constructor (id, color, quantity)
+    {
+        this.id=id;
+        this.color=color;
+        this.quantity=quantity;
+    }
+}
 
+var inputColor="";
+var inputQuantity=0;
+
+document
+.getElementById("quantity")
+.addEventListener("input", function(e){
+   inputQuantity=e.target.value;
+   console.log(inputQuantity);
+})
+
+
+document
+.getElementById("colors")
+.addEventListener("change", function(e){
+    inputColor=e.target.value;
+    console.log(inputColor);
+})
+
+document.getElementById("addToCart").addEventListener("click", function(e){
+    let myPanier=new Panier(productID,inputColor,inputQuantity);
+    console.log(myPanier);
+})
+
+localStorage.setItem("data-ID", productID);
+localStorage.setItem("data-quantity",inputQuantity);
+localStorage.setItem("data-color", inputColor);
+
+ 
 
  
 
