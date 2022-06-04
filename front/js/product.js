@@ -39,11 +39,11 @@ class Panier{
     }
 } 
 
-let dataPanier=JSON.parse(localStorage.getItem('data-panier')) || [];
-console.table(typeof(dataPanier));
+let dataPanier=JSON.parse(localStorage.getItem('data-panier')) ?? [];
+console.table(dataPanier);
 
 document.getElementById("quantity").addEventListener("input", function(e){
-   inputQuantity=e.target.value;
+   inputQuantity=parseInt(e.target.value);
    console.log(inputQuantity);
 })
 
@@ -54,33 +54,34 @@ document.getElementById("colors").addEventListener("change", function(e){
 
 document.getElementById("addToCart").addEventListener("click", function(e){
     let myPanier=new Panier(productID,inputColor,inputQuantity);
-    console.log("mon panier : ");
-    console.log(myPanier); 
-
+    
     if (dataPanier.length==0){
         dataPanier.push(myPanier);
         console.log("panier vide je dois être rajouté");
         }
 
     else{
-        for (let i=0; i<dataPanier.length;i++){
+        let newProduct=true;
+        for (const i in dataPanier){
             if ((((dataPanier[i]).color)==inputColor) && (((dataPanier[i]).id)==productID)) {
                 console.log("je suis deja la");
-            
-                dataPanier[i].quantity=String(parseInt(dataPanier[i].quantity,10)+parseInt(inputQuantity,10));
-                i=dataPanier.length;
-                
+                dataPanier[i].quantity+=inputQuantity;
+                newProduct=false;
+                break;
             }
-            else{
-                console.log("il faut m'ajouter");
-                dataPanier.push(myPanier);
-                i=dataPanier.length;
-            
-            }
+        }
+
+        if (newProduct) {
+            console.log("il faut m'ajouter");
+            dataPanier.push(myPanier);
+            /* dataPanier.push({
+                id:productID,
+                color:inputColor,
+                quantity:inputQuantity,
+            }) */
         }
     }
     localStorage.setItem("data-panier",JSON.stringify(dataPanier));
-    //console.log(dataPanier);  
 }) 
 
 console.log(dataPanier); 

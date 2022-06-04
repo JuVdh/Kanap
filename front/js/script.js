@@ -4,7 +4,14 @@ console.log(typeof(catalogueProduitsEmplacement));
 
 function getProducts(){
     return fetch("http://localhost:3000/api/products")
-    .then(res=> res.json())
+    .then(res=> {
+        /* if (!res.ok){
+            console.log("titi");
+            //throw Error(res.statusText);
+            return Promise.reject(res.statusText)
+        } */
+        
+        return res.json()})
     .catch(err=>console.log(err))
 }
 
@@ -24,8 +31,10 @@ function insertArticle(produit){
 }
 
 getProducts().then(products=>{
+    //console.log("toto");
     for (let product of products){
         insertArticle(product);
     }
 })
+//.catch(err=>console.log(err))
 
