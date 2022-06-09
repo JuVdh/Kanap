@@ -101,9 +101,21 @@ function cartUpdate(monPanier){
 cartUpdate(dataPanier);
 localStorage.setItem("data-panier",JSON.stringify(dataPanier));
 
+let productsIds=[];
+
+function getIds(monPanier){
+  for (const i in monPanier){
+    productsIds.push((monPanier[i]).id);
+  }
+  return productsIds;
+}
+
+//listeIds=getIds(dataPanier);
+
+
 
 /*******validation données utilisateurs *********/
-let dataContact=JSON.parse(localStorage.getItem('contact')) ?? [];
+
 
 function firstNameIsValid(value) {
   return /^[A-Za-z\s'-]{2,}$/.test(value);
@@ -226,7 +238,7 @@ document
   }
 });
 
-function send(e){
+/* function send(e){
   e.preventDefault();
   dataContact.push({
     prenom:firstName,
@@ -235,37 +247,98 @@ function send(e){
     ville:city,
     adresse_mail:email
 });
+
+
 fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
       'Accept': 'application/json', 
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(dataContact)
+    body: JSON.stringify(order)
   }) 
   .then(function(res) {
     if (res.ok) {
       return res.json();
     }
-  }) 
-}
-
-document
-  .getElementById("order")
-  .addEventListener("submit", send)
-    
-
+  })
+  
+}*/ 
 
 /* document
-  .getElementById("firstName")
-  .addEventListener("input", function(e) {
-  if (/^[A-Za-z\s'-]{2,}$/.test(e.target.value)) {
-    getFirstNameErrMsg().innerText = "ok";
-    disableSubmit(false);
-   
-  } else {
-    getFirstNameErrMsg().innerText = "veuillez entrer au moins 2 lettres, les chiffres ne sont pas acceptés";
-    disableSubmit(true);
-  }
-});
+  .getElementById("order")
+  .addEventListener("submit", send) */
+
+  /* let dataContact=JSON.parse(localStorage.getItem('data-contact')) ?? [];
+  let dataIds=JSON.parse(localStorage.getItem('data-ids')) ?? [];
+  let dataOrder=JSON.parse(localStorage.getItem('data-order')) ?? []; */
+let dataOrder=JSON.parse(localStorage.getItem('data-order')) ?? [];
+
+let dataContact=[];
+let dataIds=[];
+//let dataOrder=[];
+//let OrderID=JSON.parse(localStorage.getItem('data-orderID')) ?? [];
+
+/* let currentURL=document.URL;
+let url = new URL(currentURL); */
+
+//let orderID="";
+  
+  
+document.getElementById("order").addEventListener("click", function(e){
+  e.preventDefault();
+  dataContact.push({
+    prenom:firstName,
+    nom:lastName,
+    adresse:address,
+    ville:city,
+    adresse_mail:email
+  });
+
+  dataIds.push(getIds(dataPanier));
+
+  dataOrder.push({
+    contact:dataContact,
+    products:dataIds
+  });
+  
+ 
+  /* fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json', 
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataOrder)
+    }) 
+    .then(function(res) {
+      if (res.ok) {
+        
+        return res.json(); */
+        //?????rediriger user sur page confirmation en passant l'id de commande dans l'URL????????????????????//
+       
+    /*   }
+    }) */
+    //.catch(err=>console.log(err))
+
+ 
+    //localStorage.setItem('data-orderID',JSON.stringify(OrderID));
+
+/* localStorage.setItem('data-contact',JSON.stringify(dataContact));
+localStorage.setItem('data-ids',JSON.stringify(dataIds));
+localStorage.setItem('data-order',JSON.stringify(dataOrder)); */
+localStorage.setItem('data-order',JSON.stringify(dataOrder));
+
+})
+
+/* let newOrderID=JSON.parse(localStorage.getItem('data-orderID'));
+console.log(newOrderID); */
+
+/* let contact=JSON.parse(localStorage.getItem('data-contact'));
+let orderIds=JSON.parse(localStorage.getItem('data-ids'));
+let newOrder=JSON.parse(localStorage.getItem('data-order'));
+
+console.log(newOrder);
  */
+let newOrder=JSON.parse(localStorage.getItem('data-order'));
+console.log(newOrder);
