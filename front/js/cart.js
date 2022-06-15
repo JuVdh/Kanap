@@ -3,342 +3,346 @@ let cartQuantity=document.getElementById("totalQuantity");
 let cartPrice=document.getElementById("totalPrice");
 let dataPanier=JSON.parse(localStorage.getItem("data-panier"));
 
+/**
+ * Send request using fetch api to ask for all the information of the product "articlePanier" by giving its id
+ * @param { Object } articlePanier
+ * @return { Promise }
+ */
 function getProductPanier(articlePanier){
-    return fetch("http://localhost:3000/api/products/"+(articlePanier.id))
-    .then(res=> res.json())
-    .catch(err=>console.log(err))
+  return fetch("http://localhost:3000/api/products/"+(articlePanier.id))
+  .then(res=> res.json())
+  .catch(err=>console.log(err))
 }
 
+/**
+ * Insert all product information in the cart page (in the DOM)
+ * retrieved into the api and into the cart page for quantity and color selected 
+ * and update the total shopping cart
+ * @param { Object } productPanier
+ * @param { Object } articlePanier
+ * @return { }***********************************************************************************************************
+ */
 function insertArticlePanier(productPanier,articlePanier){   
 
-    let article=panier.appendChild(document.createElement("article"));
-    article.classList.add("cart__item");
+  let article=panier.appendChild(document.createElement("article"));
+  article.classList.add("cart__item");
 
-    let articleImage=article.appendChild(document.createElement("div"));
-    articleImage.classList.add("cart__item__img");
+  let articleImage=article.appendChild(document.createElement("div"));
+  articleImage.classList.add("cart__item__img");
 
-    let image=articleImage.appendChild(document.createElement("img")); 
-    image.setAttribute("src",productPanier.imageUrl);
-    image.setAttribute("alt",productPanier.altTxt); 
+  let image=articleImage.appendChild(document.createElement("img")); 
+  image.setAttribute("src",productPanier.imageUrl);
+  image.setAttribute("alt",productPanier.altTxt); 
 
-    let contenu=article.appendChild(document.createElement("div"));
-    contenu.classList.add("cart__item__content");
+  let contenu=article.appendChild(document.createElement("div"));
+  contenu.classList.add("cart__item__content");
     
-    let description=contenu.appendChild(document.createElement("div"));
-    description.classList.add("cart__item__content__description");
-    description.appendChild(document.createElement("h2")).textContent=productPanier.name;
-    description.appendChild(document.createElement("p")).textContent=articlePanier.color;
-    description.appendChild(document.createElement("p")).textContent=productPanier.price+" €";
+  let description=contenu.appendChild(document.createElement("div"));
+  description.classList.add("cart__item__content__description");
+  description.appendChild(document.createElement("h2")).textContent=productPanier.name;
+  description.appendChild(document.createElement("p")).textContent=articlePanier.color;
+  description.appendChild(document.createElement("p")).textContent=productPanier.price+" €";
     
-    let settings=contenu.appendChild(document.createElement("div"));
-    settings.classList.add("cart__item__content__settings");
+  let settings=contenu.appendChild(document.createElement("div"));
+  settings.classList.add("cart__item__content__settings");
 
-    let quantite=settings.appendChild(document.createElement("div"));
-    quantite.classList.add("cart__item__content__settings__quantity");
-    quantite.appendChild(document.createElement("p")).textContent="Qté : ";
+  let quantite=settings.appendChild(document.createElement("div"));
+  quantite.classList.add("cart__item__content__settings__quantity");
+  quantite.appendChild(document.createElement("p")).textContent="Qté : ";
     
-    let inputQuantite=quantite.appendChild(document.createElement("input"));
-    inputQuantite.classList.add("itemQuantity");
-    inputQuantite.setAttribute("type","number");
-    inputQuantite.setAttribute("name","inputQuantity");
-    inputQuantite.setAttribute("min","1");
-    inputQuantite.setAttribute("max","100");
-    inputQuantite.setAttribute("value",articlePanier.quantity);
+  let inputQuantite=quantite.appendChild(document.createElement("input"));
+  inputQuantite.classList.add("itemQuantity");
+  inputQuantite.setAttribute("type","number");
+  inputQuantite.setAttribute("name","inputQuantity");
+  inputQuantite.setAttribute("min","1");
+  inputQuantite.setAttribute("max","100");
+  inputQuantite.setAttribute("value",articlePanier.quantity);
 
-    let deleteSettings=settings.appendChild(document.createElement("div"));
-    deleteSettings.classList.add("cart__item__content__settings__delete");
-    articlePanierDelete=deleteSettings.appendChild(document.createElement("p"));
-    articlePanierDelete.classList.add("deleteItem");
-    articlePanierDelete.textContent="Supprimer";
+  let deleteSettings=settings.appendChild(document.createElement("div"));
+  deleteSettings.classList.add("cart__item__content__settings__delete");
+  articlePanierDelete=deleteSettings.appendChild(document.createElement("p"));
+  articlePanierDelete.classList.add("deleteItem");
+  articlePanierDelete.textContent="Supprimer";
 
-    
-    inputQuantite.addEventListener("change", function(e){
-            articlePanier.quantity=parseInt(e.target.value);
-            updateTotal(dataPanier);
-    })
+  // Use the addEventListener method to listen any change on quantity field in order to update the total shopping cart
+  inputQuantite.addEventListener("change", function(e){
+    articlePanier.quantity=parseInt(e.target.value);
+    updateTotal(dataPanier);
+  })
 
-    articlePanierDelete.addEventListener("click", function(e){
-        for (const i in dataPanier){
-            if (dataPanier[i]==articlePanier){
-                console.log(dataPanier[i]);
-                dataPanier.splice(i,1);
-                updateTotal(dataPanier);
-                article.innerHTML='';
-                //panier.innerHTML='';
-                //cartDisplay(dataPanier);
-                break;
-            }
-        }
-    })
+  // Use the addEventListener method to listen any click on "Supprimer" text in order to update the total shopping cart in case of deleting an article
+  articlePanierDelete.addEventListener("click", function(e){
+    for (const i in dataPanier) {
+      if (dataPanier[i]==articlePanier){
+        console.log(dataPanier[i]);
+        dataPanier.splice(i,1);
+        updateTotal(dataPanier);
+        article.innerHTML='';
+        //panier.innerHTML='';
+        //cartDisplay(dataPanier);
+        break;
+      }
+    }
+  })
 }
 
+/**
+ * Browse the response sent by the request using fetch api and insert all product information in the cart page (in the DOM)
+ * @param { Array of Objects } monPanier
+ * @return { }*****************************************************************************************************************
+ */
 function cartDisplay(monPanier){
-    for (let articlePanier of monPanier){
-        getProductPanier(articlePanier).then(product=>{
-             insertArticlePanier(product, articlePanier);
-        })
-    }
+  for (let articlePanier of monPanier){
+    getProductPanier(articlePanier)
+    .then(product=>{
+      insertArticlePanier(product, articlePanier);
+    })
+  }
+}
+  
+/**
+ * Update the total shopping cart by browsing the entire cart to calculate the total number of items and the total price
+ * @param { Array of Objects } monPanier
+ * @return { Promise????????????????????????????????????????????????????????????????????????????????????????????????????????? }
+ */
+function updateTotal(monPanier){
+  let totalPrice=0;
+  let totalQuantity=0;
+  for (let articlePanier of monPanier){
+    getProductPanier(articlePanier)
+    .then(product=>{
+      totalQuantity+= articlePanier.quantity;  
+      cartQuantity.textContent=totalQuantity;
+      totalPrice+=articlePanier.quantity*product.price;
+      cartPrice.textContent=totalPrice;
+    })
+  }
 }
 
-function updateTotal(monPanier){
-    let totalPrice=0;
-    let totalQuantity=0;
-    for (let articlePanier of monPanier){
-        getProductPanier(articlePanier).then(product=>{
-            totalQuantity+= articlePanier.quantity;  
-            cartQuantity.textContent=totalQuantity;
-            totalPrice+=articlePanier.quantity*product.price;
-            cartPrice.textContent=totalPrice;
-        })
-    }
- }
-
+/**
+ * Update the shopping cart (display and calculation of the total number of items and the total price)
+ * @param { Array of Objects } monPanier
+ * @return { Promise????????????????????????????????????????????????????????????????????????????????????????????????????????? }
+ */
 function cartUpdate(monPanier){
-    cartDisplay(monPanier);
-    updateTotal(monPanier);
+  cartDisplay(monPanier);
+  updateTotal(monPanier);
 }
  
 cartUpdate(dataPanier);
 localStorage.setItem("data-panier",JSON.stringify(dataPanier));
 
+/**
+ * Retrieve the ids of the products in the cart to build the array of strings product-ID that must be sent to the back-end
+ * @param { Array of Objects } monPanier
+ * @return { Array of Strings }
+ */
+
 let productsIds=[];
+
 
 function getIds(monPanier){
   for (const i in monPanier){
     productsIds.push((monPanier[i]).id);
   }
-  return productsIds;
+
+  // create a Set object from the array of strings product-ID to retrieve a set of unique ids values as specified 
+  return [...new Set(productsIds)];
 }
 
-//listeIds=getIds(dataPanier);
+/*******user data validation**********/
 
-
-
-/*******validation données utilisateurs *********/
-
-
+/**
+ * Test if the user data (firstName|lastName|address|city|email) are valid using regex
+ * @param { String } value
+ * @return { Boolean }
+ */
 function firstNameIsValid(value) {
-  return /^[A-Za-z\s'-]{2,}$/.test(value);
+  return /^[a-zA-Zàâäéèêëïîôöùûüç\s'-]{2,}$/.test(value);
 }
 
 function lastNameIsValid(value) {
-  return /^[A-Za-z\s'-]{2,}$/.test(value);
+  return /^[a-zA-Zàâäéèêëïîôöùûüç\s'-]{2,}$/.test(value);
 }
 
 function addressIsValid(value) {
-  return /^[0-9]*[a-zA-Z\s,'-]{3,}$/.test(value);
+  return /^[0-9]*[a-zA-Zàâäéèêëïîôöùûüç\s,'-]{3,}$/.test(value);
 }
 
 function cityIsValid(value) {
-  return /^[0-9]{1}[1-9]{1}[0-9]{3}[a-zA-Z\s,'-]{2,}$/.test(value);
+  return /^[0-9]{1}[1-9]{1}[0-9]{3}[a-zA-Zàâäéèêëïîôöùûüç\s,'-]{2,}$/.test(value);
 }
 
 function emailIsValid(value) {
   return /^[a-zA-Z0-9-_\.]+@[a-zA-Z0-9-_\.]+\.[a-zA-Z]{2,}$/.test(value);
 }
 
-function getFirstNameErrMsg(){
-    return document.getElementById("firstNameErrorMsg");
+/**
+ * Insert the error message in the cart page (in the DOM) in case of non-valid user data
+ * @param { } *************************************************************************************************
+ * @return { }
+ */
+function getFirstNameErrMsg() {
+  return document.getElementById("firstNameErrorMsg");
 }
-function getLastNameErrMsg(){
-    return document.getElementById("lastNameErrorMsg");
-}
-
-function getAddressErrMsg(){
-    return document.getElementById("addressErrorMsg");
-}
-
-function getCityErrMsg(){
-    return document.getElementById("cityErrorMsg");
+function getLastNameErrMsg() {
+  return document.getElementById("lastNameErrorMsg");
 }
 
-function getEmailErrMsg(){
-    return document.getElementById("emailErrorMsg");
+function getAddressErrMsg() {
+  return document.getElementById("addressErrorMsg");
 }
 
+function getCityErrMsg() {
+  return document.getElementById("cityErrorMsg");
+}
+
+function getEmailErrMsg() {
+  return document.getElementById("emailErrorMsg");
+}
+
+/**
+ * Set a "disabled" attribute to the submit button (in the DOM) in case of non-valid user data
+ * @param { Boolean } disabled
+ * @return { }**********************************************************************************************
+ */
 function disableSubmit(disabled) {
-    if (disabled) {
-      document
-        .getElementById("order")
-        .setAttribute("disabled", true);
-    } else {
-      document
-        .getElementById("order")
-        .removeAttribute("disabled");
-    }
+  if (disabled) {
+    document
+    .getElementById("order")
+    .setAttribute("disabled", true);
+  } else {
+    document
+    .getElementById("order")
+    .removeAttribute("disabled");
   }
+}
 
-document
-  .getElementById("firstName")
-  .addEventListener("change", function(e) {
+/*****************************user data validation and creation of the "contact" object that must be sent to the back-end***********************************/
+// as specified, for post routes, the "contact" object sent to the server must contain the following fields:
+// firstName, lastName, address, city and email
+
+let firstName="";
+let lastName="";
+let address="";
+let city="";
+let email="";
+
+
+// Use the addEventListener method to listen any change on the user data
+// Test if these data are valid (send an error message and set a "disabled" attribute to the submit button in the DOM  if not
+// Create the fields of the "contact" object
+
+document.getElementById("firstName").addEventListener("change", function(e) {
   if (firstNameIsValid(e.target.value)) {
     getFirstNameErrMsg().innerText = "ok";
     disableSubmit(false);
     firstName=e.target.value;
-   
   } else {
     getFirstNameErrMsg().innerText = "veuillez entrer au moins 2 lettres, les chiffres ne sont pas acceptés";
     disableSubmit(true);
   }
 });
 
-document
-  .getElementById("lastName")
-  .addEventListener("change", function(e) {
+document.getElementById("lastName").addEventListener("change", function(e) {
   if (lastNameIsValid(e.target.value)) {
     getLastNameErrMsg().innerText = "ok";
     disableSubmit(false);
     lastName=e.target.value;
-    
   } else {
     getLastNameErrMsg().innerText = "veuillez entrer au moins 2 lettres, les chiffres ne sont pas acceptés";
     disableSubmit(true);
   }
 });
 
-document
-  .getElementById("address")
-  .addEventListener("change", function(e) {
+document.getElementById("address").addEventListener("change", function(e) {
   if (addressIsValid(e.target.value)) {
     getAddressErrMsg().innerText = "ok";
     disableSubmit(false);
     address=e.target.value;
-    
   } else {
     getAddressErrMsg().innerText = "veuillez entrer le numéro en chiffres suivi du nom de la voie";
     disableSubmit(true);
   }
 });
 
-document
-  .getElementById("city")
-  .addEventListener("change", function(e) {
+document.getElementById("city").addEventListener("change", function(e) {
   if (cityIsValid(e.target.value)) {
     getCityErrMsg().innerText = "ok";
     disableSubmit(false);
     city=e.target.value;
-    
   } else {
     getCityErrMsg().innerText = "veuillez entrer le code postal (5 chiffres) suivi du nom de la ville";
     disableSubmit(true);
   }
 });
 
-document
-  .getElementById("email")
-  .addEventListener("change", function(e) {
+document.getElementById("email").addEventListener("change", function(e) {
   if (emailIsValid(e.target.value)) {
     getEmailErrMsg().innerText = "ok";
     disableSubmit(false);
     email=e.target.value;
-    
   } else {
     getEmailErrMsg().innerText = "veuillez entrer une adresse email valide";
     disableSubmit(true);
   }
 });
 
-/* function send(e){
+/**
+* Use the addEventListener method to listen any submit on the cart order form
+*/ 
+
+document.querySelector(".cart__order__form").addEventListener("submit", function(e){
+
+  // The preventDefault method will prevent page refresh (as it is usually done by default in case of submitting a form)
   e.preventDefault();
-  dataContact.push({
-    prenom:firstName,
-    nom:lastName,
-    adresse:address,
-    ville:city,
-    adresse_mail:email
-});
+  
+  // Retrieve the "contact" object and the array of strings product ids and create the "dataOrder" object that must be sent to the back-end
+  let dataContact={
+    firstName:firstName,
+    lastName:lastName,
+    address:address,
+    city:city,
+    email:email
+  };
 
+  let dataIds=[];
+  dataIds.push(getIds(dataPanier));
 
-fetch("http://localhost:3000/api/products/order", {
+  let dataOrder={
+    contact:dataContact,
+    products:dataIds
+  };
+
+  /**
+  * Send a post request using fetch api
+  * @param { String } method
+  * @param { Object } headers
+  * @param { Object } body
+  * @return { Promise }
+  */
+  fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
       'Accept': 'application/json', 
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(order)
+    body: JSON.stringify(dataOrder)
   }) 
+  
   .then(function(res) {
     if (res.ok) {
       return res.json();
     }
   })
-  
-}*/ 
 
-/* document
-  .getElementById("order")
-  .addEventListener("submit", send) */
-
-  /* let dataContact=JSON.parse(localStorage.getItem('data-contact')) ?? [];
-  let dataIds=JSON.parse(localStorage.getItem('data-ids')) ?? [];
-  let dataOrder=JSON.parse(localStorage.getItem('data-order')) ?? []; */
-let dataOrder=JSON.parse(localStorage.getItem('data-order')) ?? [];
-
-let dataContact=[];
-let dataIds=[];
-//let dataOrder=[];
-//let OrderID=JSON.parse(localStorage.getItem('data-orderID')) ?? [];
-
-/* let currentURL=document.URL;
-let url = new URL(currentURL); */
-
-//let orderID="";
-  
-  
-document.getElementById("order").addEventListener("click", function(e){
-  e.preventDefault();
-  dataContact.push({
-    prenom:firstName,
-    nom:lastName,
-    adresse:address,
-    ville:city,
-    adresse_mail:email
-  });
-
-  dataIds.push(getIds(dataPanier));
-
-  dataOrder.push({
-    contact:dataContact,
-    products:dataIds
-  });
-  
- 
-  /* fetch("http://localhost:3000/api/products/order", {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json', 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(dataOrder)
-    }) 
-    .then(function(res) {
-      if (res.ok) {
-        
-        return res.json(); */
-        //?????rediriger user sur page confirmation en passant l'id de commande dans l'URL????????????????????//
-       
-    /*   }
-    }) */
-    //.catch(err=>console.log(err))
-
- 
-    //localStorage.setItem('data-orderID',JSON.stringify(OrderID));
-
-/* localStorage.setItem('data-contact',JSON.stringify(dataContact));
-localStorage.setItem('data-ids',JSON.stringify(dataIds));
-localStorage.setItem('data-order',JSON.stringify(dataOrder)); */
-localStorage.setItem('data-order',JSON.stringify(dataOrder));
-
-})
-
-/* let newOrderID=JSON.parse(localStorage.getItem('data-orderID'));
-console.log(newOrderID); */
-
-/* let contact=JSON.parse(localStorage.getItem('data-contact'));
-let orderIds=JSON.parse(localStorage.getItem('data-ids'));
-let newOrder=JSON.parse(localStorage.getItem('data-order'));
-
-console.log(newOrder);
- */
-let newOrder=JSON.parse(localStorage.getItem('data-order'));
-console.log(newOrder);
+  // Retrieve the order ID in the response and redirect the user to the confirmation page by passing the order ID in the url
+  .then(data => {
+    document.location.href = `confirmation.html?orderId=${data.orderId}`;
+  })
+   
+  .catch((err) => {
+    alert ("Erreur : " + err.message);
+  })
+}) 
+    
