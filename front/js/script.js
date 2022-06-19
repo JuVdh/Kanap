@@ -7,21 +7,17 @@ let catalogueProduitsEmplacement= document.getElementById("items");
 function getProducts(){
     return fetch("http://localhost:3000/api/products")
     .then(res=> {
-        /* if (!res.ok){
-            console.log("titi");
-            //throw Error(res.statusText);
-            return Promise.reject(res.statusText)
-        } */
-        
-        return res.json()})
-    .catch(err=>console.log(err))
+        if (!res.ok){
+            throw Error("HTTP "+ res.status + " " + res.statusText);
+        } 
+        return res.json();
+    })
 }
-console.log(getProducts());
 
 /**
  * Insert a product in the home page (in the DOM)
  * @param { Object } produit
- * @return { }**************************************************************************************************************
+ * @return { }
  */
 function insertArticle(produit){
 
@@ -41,17 +37,15 @@ function insertArticle(produit){
     produitDescription.textContent=produit.description;
 }
 
-
-/**
- * Browse the response sent by the request using fetch api and insert each element (each product) in the home page (in the DOM)
- * @param { Array of objects } products**********************************************************************************************
- * @return { }***********************************************************************************************************************
- */
+// Browse the response sent by the request using fetch api and insert each element (each product) in the home page (in the DOM)
 getProducts()
 .then(products=>{
     for (let product of products){
         insertArticle(product);
     }
 })
-//.catch(err=>console.log(err))
+.catch(err=>{
+    console.log(err);
+    catalogueProduitsEmplacement.innerHTML="<h1> impossible de récupérer les données </h1>";
+})
 

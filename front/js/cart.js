@@ -1,7 +1,7 @@
 let panier=document.getElementById("cart__items");
 let cartQuantity=document.getElementById("totalQuantity");
 let cartPrice=document.getElementById("totalPrice");
-let dataPanier=JSON.parse(localStorage.getItem("data-panier"));
+let dataPanier=JSON.parse(localStorage.getItem("data-panier")) ?? [];
 
 /**
  * Send request using fetch api to ask for all the information of the product "articlePanier" by giving its id
@@ -20,12 +20,15 @@ function getProductPanier(articlePanier){
  * and update the total shopping cart
  * @param { Object } productPanier
  * @param { Object } articlePanier
- * @return { }***********************************************************************************************************
+ * @return { }
  */
 function insertArticlePanier(productPanier,articlePanier){   
 
   let article=panier.appendChild(document.createElement("article"));
   article.classList.add("cart__item");
+
+  article.setAttribute("data-id", articlePanier.id);
+  article.setAttribute("data-color", articlePanier.color);
 
   let articleImage=article.appendChild(document.createElement("div"));
   articleImage.classList.add("cart__item__img");
@@ -66,30 +69,27 @@ function insertArticlePanier(productPanier,articlePanier){
 
   // Use the addEventListener method to listen any change on quantity field in order to update the total shopping cart
   inputQuantite.addEventListener("change", function(e){
-    articlePanier.quantity=parseInt(e.target.value);
+    let article=e.target.closest("article");
+    let itemFound=dataPanier.find(item=> item.id == article.dataset.id && item.color ==article.dataset.color);
+    itemFound.quantity=parseInt(e.target.value);
+    localStorage.setItem('data-panier',JSON.stringify(dataPanier));
     updateTotal(dataPanier);
   })
 
   // Use the addEventListener method to listen any click on "Supprimer" text in order to update the total shopping cart in case of deleting an article
   articlePanierDelete.addEventListener("click", function(e){
-    for (const i in dataPanier) {
-      if (dataPanier[i]==articlePanier){
-        console.log(dataPanier[i]);
-        dataPanier.splice(i,1);
-        updateTotal(dataPanier);
-        article.innerHTML='';
-        //panier.innerHTML='';
-        //cartDisplay(dataPanier);
-        break;
-      }
-    }
+    let article=e.target.closest("article");
+    dataPanier=dataPanier.filter(item=> item.id !== article.dataset.id || item.color !==article.dataset.color);
+    updateTotal(dataPanier);
+    localStorage.setItem('data-panier',JSON.stringify(dataPanier));
+    article.remove();
   })
 }
 
 /**
  * Browse the response sent by the request using fetch api and insert all product information in the cart page (in the DOM)
  * @param { Array of Objects } monPanier
- * @return { }*****************************************************************************************************************
+ * @return { }
  */
 function cartDisplay(monPanier){
   for (let articlePanier of monPanier){
@@ -103,7 +103,7 @@ function cartDisplay(monPanier){
 /**
  * Update the total shopping cart by browsing the entire cart to calculate the total number of items and the total price
  * @param { Array of Objects } monPanier
- * @return { Promise????????????????????????????????????????????????????????????????????????????????????????????????????????? }
+ * @return { }
  */
 function updateTotal(monPanier){
   let totalPrice=0;
@@ -122,7 +122,7 @@ function updateTotal(monPanier){
 /**
  * Update the shopping cart (display and calculation of the total number of items and the total price)
  * @param { Array of Objects } monPanier
- * @return { Promise????????????????????????????????????????????????????????????????????????????????????????????????????????? }
+ * @return { }
  */
 function cartUpdate(monPanier){
   cartDisplay(monPanier);
@@ -130,27 +130,23 @@ function cartUpdate(monPanier){
 }
  
 cartUpdate(dataPanier);
-localStorage.setItem("data-panier",JSON.stringify(dataPanier));
+localStorage.setItem('data-panier',JSON.stringify(dataPanier));
 
+let productsIds=[];
 /**
  * Retrieve the ids of the products in the cart to build the array of strings product-ID that must be sent to the back-end
  * @param { Array of Objects } monPanier
  * @return { Array of Strings }
  */
-
-let productsIds=[];
-
-
 function getIds(monPanier){
   for (const i in monPanier){
     productsIds.push((monPanier[i]).id);
   }
-
   // create a Set object from the array of strings product-ID to retrieve a set of unique ids values as specified 
   return [...new Set(productsIds)];
 }
 
-/*******user data validation**********/
+/**********user data validation**********/
 
 /**
  * Test if the user data (firstName|lastName|address|city|email) are valid using regex
@@ -179,7 +175,7 @@ function emailIsValid(value) {
 
 /**
  * Insert the error message in the cart page (in the DOM) in case of non-valid user data
- * @param { } *************************************************************************************************
+ * @param { } 
  * @return { }
  */
 function getFirstNameErrMsg() {
@@ -204,7 +200,7 @@ function getEmailErrMsg() {
 /**
  * Set a "disabled" attribute to the submit button (in the DOM) in case of non-valid user data
  * @param { Boolean } disabled
- * @return { }**********************************************************************************************
+ * @return { }
  */
 function disableSubmit(disabled) {
   if (disabled) {
@@ -218,8 +214,8 @@ function disableSubmit(disabled) {
   }
 }
 
-/*****************************user data validation and creation of the "contact" object that must be sent to the back-end***********************************/
-// as specified, for post routes, the "contact" object sent to the server must contain the following fields:
+// User data validation and creation of the "contact" object that must be sent to the back-end 
+// As specified, for post routes, the "contact" object sent to the server must contain the following fields:
 // firstName, lastName, address, city and email
 
 let firstName="";
@@ -230,7 +226,7 @@ let email="";
 
 
 // Use the addEventListener method to listen any change on the user data
-// Test if these data are valid (send an error message and set a "disabled" attribute to the submit button in the DOM  if not
+// Test if these data are valid (send an error message and set a "disabled" attribute to the submit button in the DOM if not
 // Create the fields of the "contact" object
 
 document.getElementById("firstName").addEventListener("change", function(e) {
@@ -288,10 +284,7 @@ document.getElementById("email").addEventListener("change", function(e) {
   }
 });
 
-/**
-* Use the addEventListener method to listen any submit on the cart order form
-*/ 
-
+// Use the addEventListener method to listen any submit on the cart order form
 document.querySelector(".cart__order__form").addEventListener("submit", function(e){
 
   // The preventDefault method will prevent page refresh (as it is usually done by default in case of submitting a form)
@@ -306,21 +299,16 @@ document.querySelector(".cart__order__form").addEventListener("submit", function
     email:email
   };
 
-  let dataIds=[];
-  dataIds.push(getIds(dataPanier));
-
+  //let dataIds=[];
+  //dataIds.push(getIds(dataPanier));
+  let dataIds=getIds(dataPanier);
+  
   let dataOrder={
     contact:dataContact,
     products:dataIds
   };
-
-  /**
-  * Send a post request using fetch api
-  * @param { String } method
-  * @param { Object } headers
-  * @param { Object } body
-  * @return { Promise }
-  */
+  
+  // Send a post request using fetch api
   fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
