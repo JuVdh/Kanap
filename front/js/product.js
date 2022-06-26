@@ -16,7 +16,6 @@ function getProduct(id){
 /**
  * Insert all product information retrieved into the api in the product page (in the DOM)
  * @param { Object } produit
- * @return { }
  */
 function insertData(produit){
 
@@ -56,43 +55,40 @@ class Panier{
 // The total shopping cart "dataPanier" is locally stored using localStorage to make it accessible from the cart page
 let dataPanier=JSON.parse(localStorage.getItem('data-panier')) ?? [];
 
-// Use the addEventListener method to listen any type of event on color and quantity fields
-
-// Here input of a new quantity
-document.getElementById("quantity").addEventListener("input", function(e){
-   inputQuantity=parseInt(e.target.value);
-})
-
-// Here change on the color selector
-document.getElementById("colors").addEventListener("change", function(e){
-    inputColor=e.target.value;
-})
-
 // Use the addEventListener method to listen any click on the "Ajouter au panier" button to update the total shopping cart "dataPanier"
 document.getElementById("addToCart").addEventListener("click", function(e){
     
-    let myPanier=new Panier(productID,inputColor,inputQuantity);
-    
-    if (dataPanier.length==0){
-        dataPanier.push(myPanier);
-    } else {
-        let newProduct=true;
-        for (const i in dataPanier){
+   let inputColor=document.getElementById("colors").value;
+   let inputQuantity=parseInt(document.getElementById("quantity").value);
+
+    // check if the options are valid, display an alert if not and prevent the addition to the shopping cart
+    if (inputQuantity>=1 && inputQuantity<=100 && inputColor){
+
+        let myPanier=new Panier(productID,inputColor,inputQuantity);
+
+        if (dataPanier.length==0){
+            dataPanier.push(myPanier);
+        } else {
+            let newProduct=true;
+            for (const i in dataPanier){
 
             // if the product to add was already present in the total shopping cart (same id and same color), 
             // we simply increment the quantity of the product in "dataPanier"
-            if ((((dataPanier[i]).color)==inputColor) && (((dataPanier[i]).id)==productID)) {
-                dataPanier[i].quantity+=inputQuantity;
-                newProduct=false;
-                break;
+                if ((((dataPanier[i]).color)==inputColor) && (((dataPanier[i]).id)==productID)) {
+                    dataPanier[i].quantity+=inputQuantity;
+                    newProduct=false;
+                    break;
+                }
+            }   
+
+            if (newProduct) {
+                dataPanier.push(myPanier);
             }
         }
-
-        if (newProduct) {
-            dataPanier.push(myPanier);
-        }
+        localStorage.setItem("data-panier",JSON.stringify(dataPanier));
+    } else {
+        alert("la quantité ou l'option sélectionnée ne sont pas valides");
     }
-    localStorage.setItem("data-panier",JSON.stringify(dataPanier));
 }) 
 
 

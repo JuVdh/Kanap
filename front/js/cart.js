@@ -20,7 +20,6 @@ function getProductPanier(articlePanier){
  * and update the total shopping cart
  * @param { Object } productPanier
  * @param { Object } articlePanier
- * @return { }
  */
 function insertArticlePanier(productPanier,articlePanier){   
 
@@ -57,8 +56,6 @@ function insertArticlePanier(productPanier,articlePanier){
   inputQuantite.classList.add("itemQuantity");
   inputQuantite.setAttribute("type","number");
   inputQuantite.setAttribute("name","inputQuantity");
-  inputQuantite.setAttribute("min","1");
-  inputQuantite.setAttribute("max","100");
   inputQuantite.setAttribute("value",articlePanier.quantity);
 
   let deleteSettings=settings.appendChild(document.createElement("div"));
@@ -72,8 +69,14 @@ function insertArticlePanier(productPanier,articlePanier){
     let article=e.target.closest("article");
     let itemFound=dataPanier.find(item=> item.id == article.dataset.id && item.color ==article.dataset.color);
     itemFound.quantity=parseInt(e.target.value);
-    localStorage.setItem('data-panier',JSON.stringify(dataPanier));
-    updateTotal(dataPanier);
+
+    // check if the quantity is valid and display an alert if not 
+    if (itemFound.quantity>=1 && itemFound.quantity<=100){
+      localStorage.setItem('data-panier',JSON.stringify(dataPanier));
+      updateTotal(dataPanier);
+    } else {
+      alert("quantité non valide");
+    }
   })
 
   // Use the addEventListener method to listen any click on "Supprimer" text in order to update the total shopping cart in case of deleting an article
@@ -89,7 +92,6 @@ function insertArticlePanier(productPanier,articlePanier){
 /**
  * Browse the response sent by the request using fetch api and insert all product information in the cart page (in the DOM)
  * @param { Array of Objects } monPanier
- * @return { }
  */
 function cartDisplay(monPanier){
   for (let articlePanier of monPanier){
@@ -103,7 +105,6 @@ function cartDisplay(monPanier){
 /**
  * Update the total shopping cart by browsing the entire cart to calculate the total number of items and the total price
  * @param { Array of Objects } monPanier
- * @return { }
  */
 function updateTotal(monPanier){
   let totalPrice=0;
@@ -122,7 +123,6 @@ function updateTotal(monPanier){
 /**
  * Update the shopping cart (display and calculation of the total number of items and the total price)
  * @param { Array of Objects } monPanier
- * @return { }
  */
 function cartUpdate(monPanier){
   cartDisplay(monPanier);
@@ -130,6 +130,7 @@ function cartUpdate(monPanier){
 }
  
 cartUpdate(dataPanier);
+
 localStorage.setItem('data-panier',JSON.stringify(dataPanier));
 
 let productsIds=[];
@@ -176,7 +177,7 @@ function emailIsValid(value) {
 /**
  * Insert the error message in the cart page (in the DOM) in case of non-valid user data
  * @param { } 
- * @return { }
+ * @return { HTMLElement }
  */
 function getFirstNameErrMsg() {
   return document.getElementById("firstNameErrorMsg");
@@ -200,7 +201,6 @@ function getEmailErrMsg() {
 /**
  * Set a "disabled" attribute to the submit button (in the DOM) in case of non-valid user data
  * @param { Boolean } disabled
- * @return { }
  */
 function disableSubmit(disabled) {
   if (disabled) {
@@ -299,8 +299,6 @@ document.querySelector(".cart__order__form").addEventListener("submit", function
     email:email
   };
 
-  //let dataIds=[];
-  //dataIds.push(getIds(dataPanier));
   let dataIds=getIds(dataPanier);
   
   let dataOrder={

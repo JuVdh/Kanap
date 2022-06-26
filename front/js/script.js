@@ -17,7 +17,6 @@ function getProducts(){
 /**
  * Insert a product in the home page (in the DOM)
  * @param { Object } produit
- * @return { }
  */
 function insertArticle(produit){
 
