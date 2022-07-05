@@ -56,6 +56,8 @@ function insertArticlePanier(productPanier,articlePanier){
   inputQuantite.classList.add("itemQuantity");
   inputQuantite.setAttribute("type","number");
   inputQuantite.setAttribute("name","inputQuantity");
+  inputQuantite.setAttribute("min","1");
+  inputQuantite.setAttribute("max","100");
   inputQuantite.setAttribute("value",articlePanier.quantity);
 
   let deleteSettings=settings.appendChild(document.createElement("div"));
@@ -109,14 +111,20 @@ function cartDisplay(monPanier){
 function updateTotal(monPanier){
   let totalPrice=0;
   let totalQuantity=0;
-  for (let articlePanier of monPanier){
-    getProductPanier(articlePanier)
-    .then(product=>{
-      totalQuantity+= articlePanier.quantity;  
-      cartQuantity.textContent=totalQuantity;
-      totalPrice+=articlePanier.quantity*product.price;
-      cartPrice.textContent=totalPrice;
-    })
+  
+  if (monPanier.length==0){
+    cartQuantity.textContent=0;
+    cartPrice.textContent=0;
+  } else {
+    for (let articlePanier of monPanier){
+      getProductPanier(articlePanier)
+      .then(product=>{
+        totalQuantity+= articlePanier.quantity;  
+        totalPrice+=articlePanier.quantity*product.price;
+        cartQuantity.textContent=totalQuantity;
+        cartPrice.textContent=totalPrice;
+      })
+    }
   }
 }
 
